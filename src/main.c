@@ -22,18 +22,24 @@ enum state programState = IDLE;
 
 void buttonFxn(uint gpio, uint32_t eventMask);
 void init_buttons();
+void resetGyro();
 
 float gyro[3] = {0,0,0};
+float accMag = 1;
+bool fT = true;
 
-int i = 0;
+absolute_time_t prevTime;
 
 float ax, ay, az, gx, gy, gz, t;
 
-//ehkä pitää laittaa argumentti!!!!!!
 void gyroTaskFxn(void *arg){
 
+    resetGyro();
+    accMag = 1;
+    prevTime = get_absolute_time();
 
     while(1){
+
 
         if (ICM42670_read_sensor_data(&ax, &ay, &az, &gx, &gy, &gz, &t) == 0) {
             
@@ -44,32 +50,22 @@ void gyroTaskFxn(void *arg){
         }
 
 
-        
-        if(i == 10){
-            printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro[0], gyro[1], gyro[2]);
+        double dt_s = 10 * pow(10, -3);
 
-            i = 0;
-        }
-        i++;
+        dt_s = absolute_time_diff_us(prevTime, get_absolute_time()) * pow(10, -6);
+        prevTime = get_absolute_time();
 
+        accMag = sqrt(ax*ax + ay*ay + az*az);
+        //accMag = 2;
 
-        uint8_t GYRO_SENSIVITY = 131;
-        float dt_s = 0.01;
+        if(accMag < 0.99 || accMag > 1.01){
+            gyro[0] += gx * dt_s;
+            gyro[1] += gy * dt_s;
+            gyro[2] += gz * dt_s;
+            printf("gx: %.1f, gy: %.1f, gz: %.1f \n", gyro[0], gyro[1], gyro[2]);
+            printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+        } 
 
-        /*if(fabsf(gx) > 1) gyro[0] += gx / GYRO_SENSIVITY * dt_s;
-        if(fabsf(gy) > 1) gyro[1] += gy / GYRO_SENSIVITY * dt_s;
-        if(fabsf(gz) > 1) gyro[2] += gz / GYRO_SENSIVITY * dt_s;*/
-
-        gyro[0] += gx / GYRO_SENSIVITY * dt_s;
-        gyro[1] += gy / GYRO_SENSIVITY * dt_s;
-        gyro[2] += gz / GYRO_SENSIVITY * dt_s;
-
-        
-        for(int n = 0; n < 3; n++){
-            if(fabsf(gyro[n]) > 180){
-                gyro[n] = gyro[n] - ((gyro[n]/fabsf(gyro[n])) * 360);
-            }
-        }
 
         vTaskDelay(10/portTICK_PERIOD_MS);
     }
@@ -77,11 +73,23 @@ void gyroTaskFxn(void *arg){
 
 }
 
+void calibrateGyro(){
 
+    
+
+}
+
+void resetGyro(){
+
+    for(uint8_t i = 0; i < 3; i++){
+        gyro[i] = 0;
+    }
+
+}
 
 void buttonFxn(uint gpio, uint32_t eventMask){
     
-    printf("%f, %f, %f\n", gx, gy, gz);
+    resetGyro();
     toggle_led();
 
 }
@@ -102,9 +110,8 @@ void init_inits(){
 }
 
 int main() {
-    stdio_init_all();
 
-    sleep_ms(300); //Wait some time so initialization of USB and hat is done.
+    stdio_init_all();
     
     // Uncomment this lines if you want to wait till the serial monitor is connected
     while (!stdio_usb_connected()){
@@ -115,7 +122,8 @@ int main() {
     init_inits();
     ICM42670_start_with_default_values();
 
-    printf("nyt vittu!\n");
+    sleep_ms(300);
+
 
     TaskHandle_t gyroTask = NULL;
 
@@ -127,12 +135,13 @@ int main() {
         2,
         &gyroTask);
 
+    
     gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, buttonFxn);
     
 
-
     // Start the scheduler (never returns)
     vTaskStartScheduler();
+
 
     // Never reach this line.
     return 0;
