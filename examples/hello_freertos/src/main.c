@@ -6,6 +6,8 @@
 #include <queue.h>
 #include <task.h>
 
+#include "tkjhat/sdk.h"
+
 
 
 // (en) A task needs its own internal stack memory
