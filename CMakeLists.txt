@@ -58,6 +58,7 @@ include(FreeRTOS_Kernel_import.cmake)
 # include_directories(${FREERTOS_CONFIG_DIR})
 # ============
 
+
 # Option 2. === 
 # Include config only for FreeRTOS target. 
 target_include_directories(FreeRTOS-Kernel INTERFACE
@@ -80,6 +81,7 @@ add_subdirectory(libs/usb-serial-debug)
 # If created new libraries, include them here. 
 # You can EDIT it if you add new libraries
 # ===============================================================================================
+
 
 # DO NOT EDIT: Prepare build to compile the different examples ==================================
 # Add examples if necessary here
@@ -111,6 +113,13 @@ add_subdirectory(examples/hello_serial_bidirectional_client)
 # If you add the headers in a different directory, you should use: target_include_directories
 add_executable(${MAIN_TARGET}
     src/main.c
+    src/tasks/imu_task.c
+)
+
+target_include_directories(${MAIN_TARGET}
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+
 )
 
 # Links. Add all libraries that application is using. It must at least use the pico_stdlib
