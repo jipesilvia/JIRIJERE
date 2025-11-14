@@ -22,11 +22,21 @@ float ax, ay, az, gx, gy, gz, t;
 
 Gyro_data gyro_data;
 
+uint8_t calibrationCounter = 0;
+bool isCalibrating = false;
+
+
+uint8_t blank = 0;
+
+void resetGyroData();
+
+
 void gyroTaskFxn(void *arg){
 
     //resetGyro();
     accMag = 1;
     prevTime = get_absolute_time();
+    calibrateGyro();
 
     while(1){
 
@@ -48,12 +58,43 @@ void gyroTaskFxn(void *arg){
         accMag = sqrt(ax*ax + ay*ay + az*az);
         //accMag = 2;
 
-        if(accMag < 0.99 || accMag > 1.01){
-            gyro_data.x += gx * dt_s;
-            gyro_data.y += gy * dt_s;
-            gyro_data.z += gz * dt_s;
-            printf("gx: %.1f, gy: %.1f, gz: %.1f \n", gyro_data.x, gyro_data.y, gyro_data.z);
-            printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+        if(isCalibrating){
+
+            if(accMag > 0.99 && accMag < 1.01){
+                gyro_data.x += gx * dt_s;
+                gyro_data.y += gy * dt_s;
+                gyro_data.z += gz * dt_s;
+
+                calibrationCounter++;
+
+            }else{
+                printf("stop moving!\n");
+            }
+            
+            if(calibrationCounter >= 99){
+
+                gyro_data.x_offSet = gyro_data.x / 100;
+                gyro_data.y_offSet = gyro_data.y / 100;
+                gyro_data.z_offSet = gyro_data.z / 100;
+                resetGyroData();
+                isCalibrating = false;
+                calibrationCounter = 0;
+                printf("Calibrated!\n");
+                printf("Off sets: x: %f, y: %f, z: %f\n", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
+
+            }
+        }else{
+            gyro_data.x += (gx - gyro_data.x_offSet) * dt_s;
+            gyro_data.y += (gy - gyro_data.y_offSet) * dt_s;
+            gyro_data.z += (gz - gyro_data.z_offSet) * dt_s;
+
+            
+            if(blank = 10){
+                printf("gx: %.1f, gy: %.1f, gz: %.1f \n", gyro_data.x, gyro_data.y, gyro_data.z);
+                printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+                blank = 0;
+            }
+            blank++;
         } 
 
         
@@ -65,6 +106,21 @@ void gyroTaskFxn(void *arg){
 
 }
 
+void calibrateGyro(){
+
+    isCalibrating = true;
+
+}
+
+
+void resetGyroData(){
+
+    gyro_data.x = 0;
+    gyro_data.y = 0;
+    gyro_data.z = 0;
+
+
+}
 
 void init_imu_task(){
 

@@ -1,15 +1,10 @@
 
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include <pico/stdlib.h>
 
 #include <FreeRTOS.h>
 #include <queue.h>
 #include <task.h>
-
-#include <math.h>
 
 #include "tkjhat/sdk.h"
 
@@ -31,6 +26,7 @@ void init_buttons();
 void buttonFxn(uint gpio, uint32_t eventMask){
     
     toggle_led();
+    calibrateGyro();
 
 }
 
