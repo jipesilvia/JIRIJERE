@@ -114,6 +114,7 @@ add_subdirectory(examples/hello_serial_bidirectional_client)
 add_executable(${MAIN_TARGET}
     src/main.c
     src/tasks/imu_task.c
+    src/buttons.c
 )
 
 target_include_directories(${MAIN_TARGET}

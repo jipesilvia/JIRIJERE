@@ -9,6 +9,7 @@
 #include "tkjhat/sdk.h"
 
 #include "imu_task.h"
+#include "buttons.h"
 
 // Default stack size for the tasks. It can be reduced to 1024 if task is not using lot of memory.
 #define DEFAULT_STACK_SIZE 2048 
@@ -23,12 +24,7 @@ void init_buttons();
 
 
 
-void buttonFxn(uint gpio, uint32_t eventMask){
-    
-    toggle_led();
-    calibrateGyro();
 
-}
 
 void init_inits(){
 
@@ -40,8 +36,7 @@ void init_inits(){
     init_i2c_default();
 
     init_ICM42670();
-    init_rgb_led();
-    stop_rgb_led();
+    
 
 }
 
@@ -56,7 +51,15 @@ int main() {
 
     init_hat_sdk();
     init_inits();
-    ICM42670_start_with_default_values();
+    //ICM42670_start_with_default_values();
+
+    ICM42670_enable_accel_gyro_ln_mode();
+    ICM42670_startAccel(ICM42670_ACCEL_ODR_DEFAULT,
+                             ICM42670_ACCEL_FSR_DEFAULT);
+    ICM42670_startGyro(ICM42670_GYRO_ODR_DEFAULT,
+                             500);
+    
+    
 
     sleep_ms(300);
 

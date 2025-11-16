@@ -12,18 +12,23 @@
 
 
 #define DEFAULT_STACK_SIZE 2048 
-
+#define CALIBRATION_SET_SIZE 200
 
 float accMag = 1;
+float dt_s = 0.01;
 
 absolute_time_t prevTime;
 
 float ax, ay, az, gx, gy, gz, t;
+float tempGyroSums[3] = {0, 0, 0};
 
 Gyro_data gyro_data;
 
+
 uint8_t calibrationCounter = 0;
 bool isCalibrating = false;
+
+
 
 
 uint8_t blank = 0;
@@ -48,10 +53,6 @@ void gyroTaskFxn(void *arg){
         } else {
             printf("Failed to read imu data\n");
         }
-
-
-        double dt_s = 10 * pow(10, -3);
-
         dt_s = absolute_time_diff_us(prevTime, get_absolute_time()) * pow(10, -6);
         prevTime = get_absolute_time();
 
@@ -61,21 +62,23 @@ void gyroTaskFxn(void *arg){
         if(isCalibrating){
 
             if(accMag > 0.99 && accMag < 1.01){
-                gyro_data.x += gx * dt_s;
-                gyro_data.y += gy * dt_s;
-                gyro_data.z += gz * dt_s;
+                gyro_data.x += gx;
+                gyro_data.y += gy;
+                gyro_data.z += gz;
 
                 calibrationCounter++;
 
             }else{
-                printf("stop moving!\n");
+
+                printf("stop moving! %d\n", calibrationCounter);
+
             }
             
-            if(calibrationCounter >= 99){
+            if(calibrationCounter >= CALIBRATION_SET_SIZE - 1){
 
-                gyro_data.x_offSet = gyro_data.x / 100;
-                gyro_data.y_offSet = gyro_data.y / 100;
-                gyro_data.z_offSet = gyro_data.z / 100;
+                gyro_data.x_offSet = gyro_data.x / CALIBRATION_SET_SIZE;
+                gyro_data.y_offSet = gyro_data.y / CALIBRATION_SET_SIZE;
+                gyro_data.z_offSet = gyro_data.z / CALIBRATION_SET_SIZE;
                 resetGyroData();
                 isCalibrating = false;
                 calibrationCounter = 0;
@@ -83,7 +86,9 @@ void gyroTaskFxn(void *arg){
                 printf("Off sets: x: %f, y: %f, z: %f\n", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
 
             }
+
         }else{
+
             gyro_data.x += (gx - gyro_data.x_offSet) * dt_s;
             gyro_data.y += (gy - gyro_data.y_offSet) * dt_s;
             gyro_data.z += (gz - gyro_data.z_offSet) * dt_s;
@@ -107,7 +112,8 @@ void gyroTaskFxn(void *arg){
 }
 
 void calibrateGyro(){
-
+    
+    resetGyroData();
     isCalibrating = true;
 
 }
