@@ -95,7 +95,7 @@ void gyroTaskFxn(void *arg){
 
             
             if(blank = 10){
-                printf("gx: %.1f, gy: %.1f, gz: %.1f \n", gyro_data.x, gyro_data.y, gyro_data.z);
+                printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
                 printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
                 blank = 0;
             }
