@@ -65,8 +65,7 @@ int main() {
 
     init_imu_task();
 
-    gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, buttonFxn);
-    
+    init_buttons();
 
     // Start the scheduler (never returns)
     vTaskStartScheduler();

@@ -20,9 +20,8 @@ void buttonFxn(uint gpio, uint32_t eventMask){
 }
 
 
-
-
 void init_buttons(){
 
+    gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, buttonFxn);
 
 }
