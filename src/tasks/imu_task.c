@@ -51,7 +51,7 @@ void gyroTaskFxn(void *arg){
             //printf("Accel: X=%f, Y=%f, Z=%f | Gyro: X=%f, Y=%f, Z=%f| Temp: %2.2f°C\n", ax, ay, az, gx, gy, gz, t);
 
         } else {
-            printf("Failed to read imu data\n");
+            printf("__Failed to read imu data__");
         }
         dt_s = absolute_time_diff_us(prevTime, get_absolute_time()) * pow(10, -6);
         prevTime = get_absolute_time();
@@ -70,7 +70,7 @@ void gyroTaskFxn(void *arg){
 
             }else{
 
-                printf("stop moving! %d\n", calibrationCounter);
+                printf("__stop moving! %d__", calibrationCounter);
 
             }
             
@@ -82,8 +82,8 @@ void gyroTaskFxn(void *arg){
                 resetGyroData();
                 isCalibrating = false;
                 calibrationCounter = 0;
-                printf("Calibrated!\n");
-                printf("Off sets: x: %f, y: %f, z: %f\n", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
+                printf("__Calibrated!__");
+                printf("__Off sets: x: %f, y: %f, z: %f__", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
 
             }
 
@@ -93,10 +93,16 @@ void gyroTaskFxn(void *arg){
             gyro_data.y += (gy - gyro_data.y_offSet) * dt_s;
             gyro_data.z += (gz - gyro_data.z_offSet) * dt_s;
 
-            
+            // prevent multiple rounds
+            if (gyro_data.x < 0){
+                gyro_data.x = 360 - gyro_data.x;
+            } else if (gyro_data.x > 360){
+                gyro_data.x -= 360;
+            }
+
             if(blank = 10){
-                printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
-                printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+                // printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
+                // printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
                 blank = 0;
             }
 
