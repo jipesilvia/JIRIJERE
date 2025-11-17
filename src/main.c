@@ -51,13 +51,13 @@ int main() {
 
     init_hat_sdk();
     init_inits();
-    //ICM42670_start_with_default_values();
+    ICM42670_start_with_default_values();
 
-    ICM42670_enable_accel_gyro_ln_mode();
-    ICM42670_startAccel(ICM42670_ACCEL_ODR_DEFAULT,
-                             ICM42670_ACCEL_FSR_DEFAULT);
-    ICM42670_startGyro(ICM42670_GYRO_ODR_DEFAULT,
-                             500);
+    //ICM42670_enable_accel_gyro_ln_mode();
+    //ICM42670_startAccel(ICM42670_ACCEL_ODR_DEFAULT,
+    //                         ICM42670_ACCEL_FSR_DEFAULT);
+    //ICM42670_startGyro(ICM42670_GYRO_ODR_DEFAULT,
+    //                         500);
     
     
 

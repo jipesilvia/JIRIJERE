@@ -99,16 +99,15 @@ void gyroTaskFxn(void *arg){
                 printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
                 blank = 0;
             }
-            blank++;
-        } 
 
+            blank++;
+
+        }
         
         vTaskDelay(pdMS_TO_TICKS(10));
+
     }
-
-
-
-
+    
 }
 
 void calibrateGyro(){
@@ -124,7 +123,6 @@ void resetGyroData(){
     gyro_data.x = 0;
     gyro_data.y = 0;
     gyro_data.z = 0;
-
 
 }
 
