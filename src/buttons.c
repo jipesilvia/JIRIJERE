@@ -12,24 +12,19 @@
 #include "buttons.h"
 #include "serial.h"
 
+void print_char();
 
+void buttonFxn(uint gpio, uint32_t eventMask){
+    if (gpio == BUTTON1){
+        toggle_led();
+        print_char();
+    } else if (gpio == BUTTON2){
+        toggle_led();
+        calibrateGyro();
+    }
+} 
 
-void button1Fxn(uint gpio, uint32_t eventMask){
-    
-    toggle_led();
-    print_char();
+void init_buttons(){
+    gpio_set_irq_enabled_with_callback(BUTTON1, GPIO_IRQ_EDGE_RISE, true, buttonFxn);
+    gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, buttonFxn);
 }
-
-void button2Fxn(uint gpio, uint32_t eventMask){
-    
-    toggle_led();
-    calibrateGyro();
-
-}
-
-void init_buttons_irq(){
-    gpio_set_irq_enabled_with_callback(BUTTON1, GPIO_IRQ_EDGE_RISE, true, button1Fxn);
-    // gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, button2Fxn);
-}
-
-

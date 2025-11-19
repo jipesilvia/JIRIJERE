@@ -84,7 +84,10 @@ void gyroTaskFxn(void *arg){
                 calibrationCounter = 0;
                 printf("__Calibrated!__");
                 printf("__Off sets: x: %f, y: %f, z: %f__", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
-
+                // start new message
+                printf(" ");
+                printf(" ");
+                printf("\n");
             }
 
         }else{
