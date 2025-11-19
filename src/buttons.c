@@ -28,7 +28,7 @@ void button2Fxn(uint gpio, uint32_t eventMask){
 
 void init_buttons(){
     gpio_set_irq_enabled_with_callback(BUTTON1, GPIO_IRQ_EDGE_RISE, true, button1Fxn);
-    gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, button2Fxn);
+    // gpio_set_irq_enabled_with_callback(BUTTON2, GPIO_IRQ_EDGE_RISE, true, button2Fxn);
 }
 
 void print_char(){
