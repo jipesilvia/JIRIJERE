@@ -70,6 +70,7 @@
         "pdm_microphone.h": "c",
         "pins.h": "c",
         "time.h": "c",
-        "imu_task.h": "c"
+        "imu_task.h": "c",
+        "functional": "c"
     }
 }

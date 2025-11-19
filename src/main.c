@@ -10,6 +10,7 @@
 
 #include "imu_task.h"
 #include "buttons.h"
+#include "serial.h"
 
 // Default stack size for the tasks. It can be reduced to 1024 if task is not using lot of memory.
 #define DEFAULT_STACK_SIZE 2048 
@@ -17,13 +18,6 @@
 //Add here necessary states
 enum state { IDLE=1 , CHECK_ORITENTATION};
 enum state programState = IDLE;
-
-void init_buttons();
-
-
-
-
-
 
 void init_inits(){
 
@@ -63,6 +57,7 @@ int main() {
     sleep_ms(300);
 
     init_imu_task();
+    init_serial_recieve_task();
 
     init_buttons();
 
