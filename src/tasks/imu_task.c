@@ -70,7 +70,7 @@ void gyroTaskFxn(void *arg){
 
             }else{
 
-                printf("__stop moving! %d__", calibrationCounter);
+                printf("stop moving! %d\n", calibrationCounter);
 
             }
             
@@ -98,18 +98,19 @@ void gyroTaskFxn(void *arg){
 
             // prevent multiple rounds
             if (gyro_data.x < 0){
-                gyro_data.x = 360 - gyro_data.x;
+                gyro_data.x = 360 + gyro_data.x;
             } else if (gyro_data.x > 360){
                 gyro_data.x -= 360;
             }
 
+            /*for debuging
             if(blank = 10){
-                // printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
-                // printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+                printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
+                printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
                 blank = 0;
             }
-
             blank++;
+            */
 
         }
         
