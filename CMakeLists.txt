@@ -116,6 +116,7 @@ add_executable(${MAIN_TARGET}
     src/tasks/imu_task.c
     src/buttons.c
     src/serial.c
+    src/tasks/button_task.c
 )
 
 target_include_directories(${MAIN_TARGET}

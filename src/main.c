@@ -8,7 +8,7 @@
 
 #include "tkjhat/sdk.h"
 
-#include "imu_task.h"
+#include "tasks.h"
 #include "buttons.h"
 #include "serial.h"
 
@@ -19,7 +19,9 @@
 enum state { IDLE=1 , CHECK_ORITENTATION};
 enum state programState = IDLE;
 
-void init_inits(){
+void init_devices();
+
+void init_devices(){
 
     init_button1();
     init_button2();
@@ -38,28 +40,24 @@ int main() {
     stdio_init_all();
     
     // Uncomment this lines if you want to wait till the serial monitor is connected
-    while (!stdio_usb_connected()){
-        sleep_ms(10);
-    }
+
 
     init_hat_sdk();
-    init_inits();
+    init_devices();
     ICM42670_start_with_default_values();
-
-    //ICM42670_enable_accel_gyro_ln_mode();
-    //ICM42670_startAccel(ICM42670_ACCEL_ODR_DEFAULT,
-    //                         ICM42670_ACCEL_FSR_DEFAULT);
-    //ICM42670_startGyro(ICM42670_GYRO_ODR_DEFAULT,
-    //                         500);
-    
     
 
     sleep_ms(300);
 
+    while (!stdio_usb_connected()){
+        sleep_ms(10);
+    }
+
     init_imu_task();
     init_serial_recieve_task();
+    init_buttons_irq();
 
-    init_buttons();
+
 
     // Start the scheduler (never returns)
     vTaskStartScheduler();

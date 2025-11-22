@@ -8,7 +8,7 @@
 #include <pico/stdlib.h>
 #include "tkjhat/sdk.h"
 
-#include "imu_task.h"
+#include "tasks.h"
 
 
 #define DEFAULT_STACK_SIZE 2048 
@@ -20,31 +20,28 @@ float dt_s = 0.01;
 absolute_time_t prevTime;
 
 float ax, ay, az, gx, gy, gz, t;
-float tempGyroSums[3] = {0, 0, 0};
 
 Gyro_data gyro_data;
 
+// Sums for calculating calibration offset
+float tempXsum = 0, tempYsum = 0, tempZsum = 0;
 
 uint8_t calibrationCounter = 0;
 bool isCalibrating = false;
 
+// For debugging!
+int blank = 0;
 
-
-
-uint8_t blank = 0;
-
-void resetGyroData();
-
+void init_calibration();
+float roundAngle(float angle);
 
 void gyroTaskFxn(void *arg){
 
-    //resetGyro();
     accMag = 1;
     prevTime = get_absolute_time();
     calibrateGyro();
 
     while(1){
-
 
         if (ICM42670_read_sensor_data(&ax, &ay, &az, &gx, &gy, &gz, &t) == 0) {
             
@@ -62,9 +59,9 @@ void gyroTaskFxn(void *arg){
         if(isCalibrating){
 
             if(accMag > 0.99 && accMag < 1.01){
-                gyro_data.x += gx;
-                gyro_data.y += gy;
-                gyro_data.z += gz;
+                tempXsum += gx;
+                tempYsum += gy;
+                tempZsum += gz;
 
                 calibrationCounter++;
 
@@ -76,14 +73,15 @@ void gyroTaskFxn(void *arg){
             
             if(calibrationCounter >= CALIBRATION_SET_SIZE - 1){
 
-                gyro_data.x_offSet = gyro_data.x / CALIBRATION_SET_SIZE;
-                gyro_data.y_offSet = gyro_data.y / CALIBRATION_SET_SIZE;
-                gyro_data.z_offSet = gyro_data.z / CALIBRATION_SET_SIZE;
+                gyro_data.offset.x = tempXsum / CALIBRATION_SET_SIZE;
+                gyro_data.offset.y = tempYsum / CALIBRATION_SET_SIZE;
+                gyro_data.offset.z = tempZsum / CALIBRATION_SET_SIZE;
                 resetGyroData();
+                
                 isCalibrating = false;
-                calibrationCounter = 0;
+
                 printf("__Calibrated!__");
-                printf("__Off sets: x: %f, y: %f, z: %f__", gyro_data.x_offSet, gyro_data.y_offSet, gyro_data.z_offSet);
+                printf("__Off sets: x: %f, y: %f, z: %f__", gyro_data.offset.x, gyro_data.offset.y, gyro_data.offset.z);
                 // start new message
                 printf(" ");
                 printf(" ");
@@ -92,25 +90,19 @@ void gyroTaskFxn(void *arg){
 
         }else{
 
-            gyro_data.x += (gx - gyro_data.x_offSet) * dt_s;
-            gyro_data.y += (gy - gyro_data.y_offSet) * dt_s;
-            gyro_data.z += (gz - gyro_data.z_offSet) * dt_s;
+            gyro_data.orientation.x += (gx - gyro_data.offset.x) * dt_s;
+            gyro_data.orientation.y += (gy - gyro_data.offset.y) * dt_s;
+            gyro_data.orientation.z += (gz - gyro_data.offset.z) * dt_s;
 
-            // prevent multiple rounds
-            if (gyro_data.x < 0){
-                gyro_data.x = 360 + gyro_data.x;
-            } else if (gyro_data.x > 360){
-                gyro_data.x -= 360;
-            }
-
-            /*for debuging
-            if(blank = 10){
-                printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.x, gyro_data.y, gyro_data.z);
-                printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
+            
+            //for debugging
+            if(blank = 1000){
+                //printf("gx: %.5f, gy: %.5f, gz: %.5f \n", gyro_data.orientation.x, gyro_data.orientation.y, gyro_data.orientation.z);
+                //printf("accMag: %f, dt_s: %f\n", accMag, dt_s);
                 blank = 0;
             }
             blank++;
-            */
+            
 
         }
         
@@ -120,19 +112,53 @@ void gyroTaskFxn(void *arg){
     
 }
 
-void calibrateGyro(){
+orientation getRoundedOrientation(){
+
+    orientation rounded;
     
+    rounded.x = roundAngle(gyro_data.orientation.x);
+    rounded.y = roundAngle(gyro_data.orientation.y);
+    rounded.z = roundAngle(gyro_data.orientation.z);
+
+    return rounded;
+}
+
+float roundAngle(float angle){
+
+    float angleAbs = fabsf(angle);
+    float angleSign = angleAbs / angle;
+
+    if(angleAbs < 40){
+        return 0;
+    }else if(angleAbs > 50){
+        return 90 * angleSign;
+    }else{
+        return 0;
+    }
+
+}
+
+void calibrateGyro(){
+    init_calibration();
     resetGyroData();
     isCalibrating = true;
 
 }
 
-
 void resetGyroData(){
 
-    gyro_data.x = 0;
-    gyro_data.y = 0;
-    gyro_data.z = 0;
+    gyro_data.orientation.x = 0;
+    gyro_data.orientation.y = 0;
+    gyro_data.orientation.z = 0;
+
+}
+
+void init_calibration(){
+
+    calibrationCounter = 0;
+    tempXsum = 0;
+    tempYsum = 0;
+    tempZsum = 0;
 
 }
 

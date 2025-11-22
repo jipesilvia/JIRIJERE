@@ -2,23 +2,50 @@
 #include <pico/stdlib.h>
 #include <FreeRTOS.h>
 #include <task.h>
-#include "imu_task.h"
+#include "tasks.h"
 #include "buttons.h"
 #include "serial.h"
 
 #define DEFAULT_STACK_SIZE 2048
 #define INPUT_BUFFER_SIZE 256
 
+orientation up = {90, 0, 0};
+orientation straight = {0, 0, 0};
+orientation right = {0, 0, -90};
+orientation left = {0, 0, 90};
+
+bool compareOrientations(orientation a, orientation b);
+
 void print_char(){
-    if (gyro_data.x > 330 || gyro_data.x < 30){
+    orientation current = getRoundedOrientation();
+    if (compareOrientations(current, straight)){
         printf(".");
-    } else if (gyro_data.x > 60 && gyro_data.x < 120){
+    } else if (compareOrientations(current, left)){
         printf("-");
-    } else if (gyro_data.x > 150 && gyro_data.x < 210){
+    } else if (compareOrientations(current, up)){
         printf("\n");
-    } else if (gyro_data.x > 240 && gyro_data.x < 300){
+    } else if (compareOrientations(current, right)){
         printf(" ");
     }
+    gyro_data.orientation = current;
+}
+
+bool compareOrientations(orientation a, orientation b){
+
+    if(a.x != b.x){
+        return false;
+    }
+    
+    /*if(a.y != b.y){
+        return false;
+    }*/
+
+    if(a.z != b.z){
+        return false;
+    }
+
+    return true;
+
 }
 
 static void receive_task(void *arg){
