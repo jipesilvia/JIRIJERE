@@ -16,6 +16,7 @@ orientation right = {0, 0, -90};
 orientation left = {0, 0, 90};
 
 bool compareOrientations(orientation a, orientation b);
+void displayMessage(char *line);
 
 
 // Prints character based on the current orientation of IMU.
@@ -64,17 +65,14 @@ static void receive_task(void *arg){
     
     while (1){
         int c = getchar_timeout_us(0);
-        if (c != PICO_ERROR_TIMEOUT){// I have received a character
-            //programState = RECEIVING_MESSAGE;
+        if (c != PICO_ERROR_TIMEOUT && programState == IDLE){// I have received a character
             if (c == '\r') continue; // ignore CR, wait for LF if (ch == '\n') { line[len] = '\0';
             if (c == '\n'){
                 // terminate and process the collected line
                 line[index] = '\0'; 
                 printf("__[RX]:\"%s\"__\n", line); //Print as debug in the output
                 index = 0;
-                clear_display();
-                draw_square(10, 10, 10, 10, true);
-                //programState = IDLE;
+                programState = DISPLAY_MESSAGE;
                 vTaskDelay(pdMS_TO_TICKS(100)); // Wait for new message
             }
             else if(index < INPUT_BUFFER_SIZE - 1){
@@ -87,8 +85,29 @@ static void receive_task(void *arg){
                 line[index++] = (char)c; 
             }
         }
+        else if (programState == DISPLAY_MESSAGE){
+            displayMessage(line);
+            programState = IDLE;
+        }
         else {
             vTaskDelay(pdMS_TO_TICKS(100)); // Wait for new message
+        }
+    }
+}
+
+void displayMessage(char *line){
+    clear_display();
+    for (int i = 0; i < INPUT_BUFFER_SIZE; i++){
+        if (line[i] == "-"){
+            draw_line(32, 32, 96, 32);
+            vTaskDelay(pdMS_TO_TICKS(100));
+        } else if (line[i] == "."){
+            draw_circle(64, 32, 20, true);
+            vTaskDelay(pdMS_TO_TICKS(100));
+        } else if (line[i] == "\n"){
+            return;
+        } else {
+            vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
 }
