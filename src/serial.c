@@ -23,9 +23,9 @@ bool compareOrientations(orientation a, orientation b);
 void print_char(){
     orientation current = getRoundedOrientation();
     if (compareOrientations(current, straight)){
-        putchar_raw('.');
+        printf(".");
     } else if (compareOrientations(current, left)){
-        putchar_raw('-');
+        printf("-");
     } else if (compareOrientations(current, up)){
         putchar_raw('\n');
     } else if (compareOrientations(current, right)){
@@ -65,15 +65,16 @@ static void receive_task(void *arg){
     while (1){
         int c = getchar_timeout_us(0);
         if (c != PICO_ERROR_TIMEOUT){// I have received a character
-            programState = RECEIVING_MESSAGE;
+            //programState = RECEIVING_MESSAGE;
             if (c == '\r') continue; // ignore CR, wait for LF if (ch == '\n') { line[len] = '\0';
             if (c == '\n'){
                 // terminate and process the collected line
                 line[index] = '\0'; 
                 printf("__[RX]:\"%s\"__\n", line); //Print as debug in the output
                 index = 0;
-                write_text(line);
-                programState = IDLE;
+                clear_display();
+                draw_square(10, 10, 10, 10, true);
+                //programState = IDLE;
                 vTaskDelay(pdMS_TO_TICKS(100)); // Wait for new message
             }
             else if(index < INPUT_BUFFER_SIZE - 1){

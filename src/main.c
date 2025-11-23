@@ -55,10 +55,11 @@ int main() {
 
     init_button_task();
     init_imu_task();
-    //init_serial_recieve_task();
+    init_serial_recieve_task();
     init_buttons_irq();
 
-    write_text("test");
+    clear_display();
+    //write_text("--...");
 
     // Start the scheduler (never returns)
     vTaskStartScheduler();

@@ -489,6 +489,7 @@ void draw_circle(int16_t x0, int16_t y0, int16_t r, bool fill) {
 
     // Update the display
     ssd1306_show(&disp);
+    
 }
 
 void clear_display() {
