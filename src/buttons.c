@@ -13,13 +13,17 @@
 #include "serial.h"
 
 
+
 void buttonFxn(uint gpio, uint32_t eventMask){
+    
+    if(programState != IDLE) return;
+    
     if (gpio == BUTTON1){
-        toggle_led();
-        print_char();
+        programState = SEND_CHAR;
+
     } else if (gpio == BUTTON2){
-        toggle_led();
-        resetGyroData();
+        programState = CENTER_GYRO;
+
     }
 } 
 

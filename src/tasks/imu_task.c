@@ -14,6 +14,7 @@
 #define DEFAULT_STACK_SIZE 2048 
 #define CALIBRATION_SET_SIZE 200
 
+// Acceleration magnitude
 float accMag = 1;
 float dt_s = 0.01;
 
@@ -21,11 +22,11 @@ absolute_time_t prevTime;
 
 float ax, ay, az, gx, gy, gz, t;
 
+// Initializes global gyro_data variable
 Gyro_data gyro_data;
 
 // Sums for calculating calibration offset
 float tempXsum = 0, tempYsum = 0, tempZsum = 0;
-
 uint8_t calibrationCounter = 0;
 bool isCalibrating = false;
 
@@ -44,20 +45,20 @@ void gyroTaskFxn(void *arg){
     while(1){
 
         if (ICM42670_read_sensor_data(&ax, &ay, &az, &gx, &gy, &gz, &t) == 0) {
-            
             //printf("Accel: X=%f, Y=%f, Z=%f | Gyro: X=%f, Y=%f, Z=%f| Temp: %2.2f°C\n", ax, ay, az, gx, gy, gz, t);
-
         } else {
             printf("__Failed to read imu data__");
         }
-        dt_s = absolute_time_diff_us(prevTime, get_absolute_time()) * pow(10, -6);
-        prevTime = get_absolute_time();
+
+        dt_s = absolute_time_diff_us(prevTime, get_absolute_time()) * pow(10, -6); // calculate the time passed from previous iteration.
+        prevTime = get_absolute_time(); // set previoustime to current time.
 
         accMag = sqrt(ax*ax + ay*ay + az*az);
-        //accMag = 2;
 
+        // Either calibrate the gyro or update the orientation.
         if(isCalibrating){
-
+            // add gyroscore drift to the sums only if the device is steady.
+            // otherwise starts over the calibration.
             if(accMag > 0.99 && accMag < 1.01){
                 tempXsum += gx;
                 tempYsum += gy;
@@ -67,10 +68,13 @@ void gyroTaskFxn(void *arg){
 
             }else{
 
-                printf("stop moving! %d\n", calibrationCounter);
+                printf("Don't move the device while calibrating!");
+                vTaskDelay(pdMS_TO_TICKS(2000));
+                calibrateGyro();
 
             }
             
+            // calculates the average drift of gyro when enough data is collected.
             if(calibrationCounter >= CALIBRATION_SET_SIZE - 1){
 
                 gyro_data.offset.x = tempXsum / CALIBRATION_SET_SIZE;
@@ -112,6 +116,8 @@ void gyroTaskFxn(void *arg){
     
 }
 
+
+// Rounds orientation x,y,x to 0 or +-90
 orientation getRoundedOrientation(){
 
     orientation rounded;
@@ -123,6 +129,7 @@ orientation getRoundedOrientation(){
     return rounded;
 }
 
+// Rounds angle to 0 or +-90
 float roundAngle(float angle){
 
     float angleAbs = fabsf(angle);
@@ -138,13 +145,16 @@ float roundAngle(float angle){
 
 }
 
+// Starts calibration
 void calibrateGyro(){
+    printf("Calibrating gyro. Keep device still!\n");
     init_calibration();
     resetGyroData();
     isCalibrating = true;
 
 }
 
+// Resets gyro orientation to zero
 void resetGyroData(){
 
     gyro_data.orientation.x = 0;
@@ -153,6 +163,7 @@ void resetGyroData(){
 
 }
 
+// Initializes variables needed for calibration
 void init_calibration(){
 
     calibrationCounter = 0;

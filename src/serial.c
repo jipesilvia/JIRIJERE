@@ -16,6 +16,9 @@ orientation left = {0, 0, 90};
 
 bool compareOrientations(orientation a, orientation b);
 
+
+// Prints character based on the current orientation of IMU.
+// 
 void print_char(){
     orientation current = getRoundedOrientation();
     if (compareOrientations(current, straight)){
@@ -27,9 +30,14 @@ void print_char(){
     } else if (compareOrientations(current, right)){
         printf(" ");
     }
-    gyro_data.orientation = current;
+    
+    //gyro_data.orientation = current; // sets the orientation to the rounded values.
+     // The point of this is to clear any accidental drift caused by user. But this has it's flaws.
 }
 
+
+// Compares two orientation type objects. Returns true if equal.
+// Y-axis excluded because it caused unnecessary falses.
 bool compareOrientations(orientation a, orientation b){
 
     if(a.x != b.x){

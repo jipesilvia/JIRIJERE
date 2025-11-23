@@ -16,7 +16,7 @@
 #define DEFAULT_STACK_SIZE 2048 
 
 //Add here necessary states
-enum state { IDLE=1 , CHECK_ORITENTATION};
+
 enum state programState = IDLE;
 
 void init_devices();
@@ -32,15 +32,13 @@ void init_devices(){
 
     init_ICM42670();
     
-
 }
+
+
 
 int main() {
 
     stdio_init_all();
-    
-    // Uncomment this lines if you want to wait till the serial monitor is connected
-
 
     init_hat_sdk();
     init_devices();
@@ -53,6 +51,7 @@ int main() {
         sleep_ms(10);
     }
 
+    init_button_task();
     init_imu_task();
     init_serial_recieve_task();
     init_buttons_irq();
