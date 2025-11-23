@@ -68,7 +68,7 @@ void gyroTaskFxn(void *arg){
 
             }else{
 
-                printf("Don't move the device while calibrating!");
+                printf("Don't move the device while calibrating!\n");
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 calibrateGyro();
 

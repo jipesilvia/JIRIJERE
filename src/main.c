@@ -53,7 +53,7 @@ int main() {
 
     init_button_task();
     init_imu_task();
-    init_serial_recieve_task();
+    //init_serial_recieve_task();
     init_buttons_irq();
 
 

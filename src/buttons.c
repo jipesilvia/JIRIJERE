@@ -13,7 +13,7 @@
 #include "serial.h"
 
 
-
+// Using state machine and task to debounce buttons.
 void buttonFxn(uint gpio, uint32_t eventMask){
     
     if(programState != IDLE) return;

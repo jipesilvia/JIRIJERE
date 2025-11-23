@@ -23,7 +23,7 @@ void buttonTaskFxn(void *arg){
 
             toggle_led();
             print_char();
-            vTaskDelay(pdMS_TO_TICKS(200));
+            vTaskDelay(pdMS_TO_TICKS(200));// debounce
             toggle_led();
             programState = IDLE;
 
@@ -31,7 +31,7 @@ void buttonTaskFxn(void *arg){
 
             toggle_led();
             resetGyroData();
-            vTaskDelay(pdMS_TO_TICKS(200));
+            vTaskDelay(pdMS_TO_TICKS(200)); // debounce
             toggle_led();
             programState = IDLE;
             

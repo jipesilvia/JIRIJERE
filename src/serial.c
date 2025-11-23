@@ -22,13 +22,13 @@ bool compareOrientations(orientation a, orientation b);
 void print_char(){
     orientation current = getRoundedOrientation();
     if (compareOrientations(current, straight)){
-        printf(".");
+        putchar_raw('.');
     } else if (compareOrientations(current, left)){
-        printf("-");
+        putchar_raw('-');
     } else if (compareOrientations(current, up)){
-        printf("\n");
+        putchar_raw('\n');
     } else if (compareOrientations(current, right)){
-        printf(" ");
+        putchar_raw(' ');
     }
     
     //gyro_data.orientation = current; // sets the orientation to the rounded values.
