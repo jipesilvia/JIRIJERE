@@ -28,6 +28,8 @@ void init_devices(){
 
     init_led();
 
+    init_display();
+
     init_i2c_default();
 
     init_ICM42670();
@@ -56,7 +58,7 @@ int main() {
     //init_serial_recieve_task();
     init_buttons_irq();
 
-
+    write_text("test");
 
     // Start the scheduler (never returns)
     vTaskStartScheduler();

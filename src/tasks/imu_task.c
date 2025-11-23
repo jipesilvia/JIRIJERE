@@ -68,7 +68,7 @@ void gyroTaskFxn(void *arg){
 
             }else{
 
-                printf("Don't move the device while calibrating!\n");
+                printf("__Don't move the device while calibrating!__");
                 vTaskDelay(pdMS_TO_TICKS(2000));
                 calibrateGyro();
 
@@ -117,7 +117,7 @@ void gyroTaskFxn(void *arg){
 }
 
 
-// Rounds orientation x,y,x to 0 or +-90
+// Rounds orientation x,y and z to 0 or +-90
 orientation getRoundedOrientation(){
 
     orientation rounded;
@@ -147,7 +147,7 @@ float roundAngle(float angle){
 
 // Starts calibration
 void calibrateGyro(){
-    printf("Calibrating gyro. Keep device still!\n");
+    printf("__Calibrating gyro. Keep device still!__");
     init_calibration();
     resetGyroData();
     isCalibrating = true;
