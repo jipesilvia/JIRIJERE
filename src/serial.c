@@ -65,6 +65,7 @@ static void receive_task(void *arg){
     while (1){
         int c = getchar_timeout_us(0);
         if (c != PICO_ERROR_TIMEOUT){// I have received a character
+            programState = RECEIVING_MESSAGE;
             if (c == '\r') continue; // ignore CR, wait for LF if (ch == '\n') { line[len] = '\0';
             if (c == '\n'){
                 // terminate and process the collected line
@@ -72,6 +73,7 @@ static void receive_task(void *arg){
                 printf("__[RX]:\"%s\"__\n", line); //Print as debug in the output
                 index = 0;
                 write_text(line);
+                programState = IDLE;
                 vTaskDelay(pdMS_TO_TICKS(100)); // Wait for new message
             }
             else if(index < INPUT_BUFFER_SIZE - 1){
