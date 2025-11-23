@@ -9,7 +9,7 @@ typedef struct {
     orientation offset;
 }Gyro_data;
 
-enum state {IDLE=1, CENTER_GYRO, SEND_CHAR, DISPLAY_MESSAGE};
+enum state {IDLE=1, CENTER_GYRO, SEND_CHAR};
 
 extern enum state programState;
 extern Gyro_data gyro_data;
