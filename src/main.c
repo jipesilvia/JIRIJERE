@@ -1,3 +1,5 @@
+// Jere Uusimäki, Jiri Luostarinen
+
 
 #include <stdio.h>
 #include <pico/stdlib.h>
@@ -27,7 +29,10 @@ void init_devices(){
     init_button2();
 
     init_led();
-    
+
+    init_display();
+
+    init_buzzer();
 
     init_i2c_default();
 
@@ -56,6 +61,9 @@ int main() {
     init_imu_task();
     init_serial_recieve_task();
     init_buttons_irq();
+
+    clear_display();
+    // write_text("Waiting.");
 
     // Start the scheduler (never returns)
     vTaskStartScheduler();
