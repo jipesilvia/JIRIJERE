@@ -45,7 +45,7 @@ void gyroTaskFxn(void *arg){
     while(1){
 
         if (ICM42670_read_sensor_data(&ax, &ay, &az, &gx, &gy, &gz, &t) == 0) {
-            //printf("Accel: X=%f, Y=%f, Z=%f | Gyro: X=%f, Y=%f, Z=%f| Temp: %2.2f°C\n", ax, ay, az, gx, gy, gz, t);
+            // printf("Accel: X=%f, Y=%f, Z=%f | Gyro: X=%f, Y=%f, Z=%f| Temp: %2.2f°C\n", ax, ay, az, gx, gy, gz, t);
         } else {
             printf("__Failed to read imu data__");
         }
@@ -69,7 +69,7 @@ void gyroTaskFxn(void *arg){
             }else{
 
                 printf("__Don't move the device while calibrating!__");
-                vTaskDelay(pdMS_TO_TICKS(2000));
+                sleep_ms(2000);
                 calibrateGyro();
 
             }
@@ -180,7 +180,7 @@ void init_imu_task(){
     BaseType_t gyroResult = xTaskCreate(
     gyroTaskFxn,
     "GYRO_TASK",
-    DEFAULT_STACK_SIZE,
+    1024,
     NULL,
     2,
     &gyroTask);
